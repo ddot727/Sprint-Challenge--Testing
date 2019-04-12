@@ -2,6 +2,38 @@ const request = require('supertest');
 const server = require('./server');
 
 describe('/games', () => {
+
+  describe('GET /games', () => {
+    it('should be an array', async () => {
+      await request(server).get('/games-db-reset');
+      const res = await request(server).get('/games');
+      expect(res.body).toHaveLength(0);
+      expect(Array.isArray(res.body)).toBe(true);
+    });
+
+    it("should respond with JSON", () => {
+      return request(server)
+        .get("/games")
+        .expect("Content-Type", /json/);
+    });
+  
+    it('should an array with a length of one', async () => {
+     await request(server).get('/games-db-reset');
+     await request(server)
+       .post('/games')
+       .send({ title: 'Mario Kart', genre: 'Racing' });
+     const res = await request(server).get('/games');
+     expect(res.body).toHaveLength(1);
+   });
+  
+    it('should return 200 OK', async () => {
+     await request(server).get('/games-db-reset');
+     const res = await request(server).get('/games');
+     expect(res.status).toBe(200);
+   });
+  });
+
+
   describe('POST /games', () => {
     it('should return 201', async () => {
       await request(server).get('/games-db-reset');
@@ -55,27 +87,4 @@ describe('/games', () => {
     });
   });
 
-   describe('GET /games', () => {
-    it('should be an array', async () => {
-      await request(server).get('/games-db-reset');
-      const res = await request(server).get('/games');
-      expect(res.body).toHaveLength(0);
-      expect(Array.isArray(res.body)).toBe(true);
-    });
-
-     it('should an array with a length of one', async () => {
-      await request(server).get('/games-db-reset');
-      await request(server)
-        .post('/games')
-        .send({ title: 'Mario Kart', genre: 'Racing' });
-      const res = await request(server).get('/games');
-      expect(res.body).toHaveLength(1);
-    });
-
-     it('should return 200 OK', async () => {
-      await request(server).get('/games-db-reset');
-      const res = await request(server).get('/games');
-      expect(res.status).toBe(200);
-    });
-  });
 });
